@@ -9,8 +9,7 @@ import (
 	"github.com/falun/aspartame/types"
 )
 
-var enumTemplate string = `
-package foo
+var enumTemplate string = `package {{ .Package }}
 
 {{ . }}
 

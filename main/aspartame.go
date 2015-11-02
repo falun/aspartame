@@ -2,7 +2,6 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"os"
 
 	"github.com/falun/aspartame/generators"
@@ -18,8 +17,6 @@ func main() {
 	filePath := flag.Args()[0]
 
 	f := types.NewFile(filePath)
-	// fmt.Println(f)
-	fmt.Println()
 
 	generators.GenerateEnum(f, os.Stdout)
 }
