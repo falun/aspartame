@@ -51,25 +51,24 @@ func (f *File) parseConsts() {
 
 	for _, d := range f.Ast.Decls {
 		decl, isDecl := d.(*ast.GenDecl)
+
 		if isDecl && (decl.Tok == token.CONST) {
-			// in const block; how many value specs
 			curConstBlock := ConstBlock{}
 			curConstBlock.Contents = make([]Const, 0)
 
-			var curType *string = nil
+			curType := ""
 			for _, spec := range decl.Specs {
+
 				if vs, isValueSpec := spec.(*ast.ValueSpec); isValueSpec {
 					if vs.Type != nil {
-						if curType == nil {
-							curType = new(string)
-						}
-						*curType = fmt.Sprintf("%s", vs.Type)
+						// found a new type
+						curType = fmt.Sprintf("%s", vs.Type)
 					}
 
-					for i, _ := range vs.Names {
+					for _, n := range vs.Names {
 						curConstBlock.Contents = append(
 							curConstBlock.Contents,
-							Const{Type: *curType, Name: vs.Names[i].Name})
+							Const{Type: curType, Name: n.Name})
 					}
 				}
 			}
