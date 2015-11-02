@@ -4,12 +4,11 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
-	// "go/build"
-	// "go/format"
 	"go/parser"
 	"go/token"
 )
 
+// Holds the information we need about a given Const
 type Const struct {
 	Type string
 	Name string
@@ -19,6 +18,8 @@ func (c Const) String() string {
 	return fmt.Sprintf("Const[%s, %s]", c.Name, c.Type)
 }
 
+// Logical grouping of consts within the file; this also represents the
+// range over which an iota has the ability to define increasing values
 type ConstBlock struct {
 	Contents []Const
 }
