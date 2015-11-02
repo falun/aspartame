@@ -1,7 +1,6 @@
-package main // import "github.com/falun/aspartame"
+package types
 
 import (
-	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -25,16 +24,18 @@ type ConstBlock struct {
 }
 
 type File struct {
-	Path   string
-	Ast    *ast.File
-	Consts []ConstBlock
+	Path    string
+	Package string
+	Ast     *ast.File
+	Consts  []ConstBlock
 }
 
 func (f *File) String() string {
 	str := "File {\n"
 	str += fmt.Sprintf("  path: %s\n", f.Path)
+	str += fmt.Sprintf("  package: %s\n", f.Package)
 	str += fmt.Sprintf("  ast: %p\n", f.Ast)
-	str += fmt.Sprintf("  Consts {\n")
+	str += fmt.Sprintf("  consts {\n")
 	for i, cb := range f.Consts {
 		str += fmt.Sprintf("    Const block %d\n", (i + 1))
 		for _, c := range cb.Contents {
@@ -87,22 +88,20 @@ func NewFile(path string) *File {
 
 	if err != nil {
 		fmt.Println(err)
+		return nil
 	}
 
-	f := File{Path: path, Ast: fAst}
+	pkg := ""
+	if fn := fAst.Name; fn != nil {
+		pkg = fn.Name
+	}
+
+	f := File{
+		Path:    path,
+		Package: pkg,
+		Ast:     fAst,
+	}
 	f.parseConsts()
 
 	return &f
-}
-
-func main() {
-	flag.Parse()
-	if len(flag.Args()) != 1 {
-		return
-	}
-
-	filePath := flag.Args()[0]
-
-	f := NewFile(filePath)
-	fmt.Println(f)
 }
