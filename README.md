@@ -27,4 +27,4 @@ The generated code will be produced in the same package and currently provides t
 * `ByName(string)`&mdash;given an enum name produce the corresponding value
 
 ##### Example
-See [this play link](http://play.golang.org/p/ZTbQzepKTY)
+See [this play link](http://play.golang.org/p/B2Ffl3nr5V)
