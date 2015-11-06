@@ -1,6 +1,7 @@
 package types
 
 import (
+	"errors"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -21,6 +22,40 @@ func (c Const) String() string {
 // range over which an iota has the ability to define increasing values
 type ConstBlock struct {
 	Contents []Const
+}
+
+func (cb *ConstBlock) Length() int {
+	return len(cb.Contents)
+}
+
+func (cb *ConstBlock) IsHomogenous() bool {
+	if cb.Length() == 0 {
+		return true
+	}
+
+	t := cb.Contents[0].Type
+	for _, v := range cb.Contents {
+		if t != v.Type {
+			return false
+		}
+	}
+
+	return true
+}
+
+var typeErrMany error = errors.New("ConstBlock has inconsistent Type")
+var typeErrNone error = errors.New("ConstBlock has no contents (thus no type)")
+
+func (cb *ConstBlock) Type() (string, error) {
+	if cb.IsHomogenous() {
+		if cb.Length() == 0 {
+			return "", typeErrNone
+		} else {
+			return cb.Contents[0].Type, nil
+		}
+	} else {
+		return "", typeErrMany
+	}
 }
 
 type File struct {

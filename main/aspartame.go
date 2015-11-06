@@ -14,9 +14,13 @@ func main() {
 		return
 	}
 
+	// target := "enum"
+	name := "Foo"
+	source := "FooEnumType"
+
 	filePath := flag.Args()[0]
 
 	f := types.NewFile(filePath)
 
-	generators.GenerateEnum(f, os.Stdout)
+	generators.GenerateEnum(f, name, source, os.Stdout)
 }

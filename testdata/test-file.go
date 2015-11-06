@@ -1,10 +1,16 @@
 package main
 
-// go:generate aspartame -enum Bar -type BarEnumType
-type BarEnumType int
+import (
+	"errors"
+	"fmt"
+)
+
+// go:generate aspartame -target enum -name Foo -source FooEnumType
+type FooEnumType int
 
 const (
-	baz BarEnumType = 1234 + iota
+	bar FooEnumType = iota
+	baz
 	quix
 	quux
 )
