@@ -1,6 +1,6 @@
 ### Aspartame
 
-A `go:generate` tool that makes enums slightly less annoying (to me). Probably not idiomatic.
+A `go:generate` tool that makes some go things (currently only "enums") slightly less annoying to me. Probably not idiomatic.
 
 
 ##### Usage
