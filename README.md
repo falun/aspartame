@@ -18,6 +18,8 @@ This describes eventual usage as the tooling doesn't actually parse command line
 		quux
 	)
 
+Note that the enum values we define are _not_ exported. This is not currently enforced but I'll add that eventually.
+
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
 
@@ -28,3 +30,6 @@ The generated code will be produced in the same package and currently provides t
 
 ##### Example
 See [this play link](http://play.golang.org/p/GSP8Eq0Vyo)
+
+##### Limitations
+They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out the values. Adding that should be pretty simple but didn't make the first cut.
