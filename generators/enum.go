@@ -35,27 +35,25 @@ type {{ .EnumName }}Container struct { {{ range $e := .Elements }}
 // uncertain if I want to return pointer or not
 func (this *{{ .EnumName }}Container) ByValue(v int) (*{{ .EnumType }}, error) {
 	value := new({{ .EnumType }})
-  var err error = nil
 
   switch v { {{ range $e := .Elements }}
     case int(_{{ $e.Name }}): *value = _{{ $e.Name }}{{end}}
-    default: err = errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated with value %d", v))
+    default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated with value %d", v))
   }
 
-	return value, err
+	return value, nil
 }
 
 // uncertain if I want to return pointer or not
 func (this *{{ .EnumName }}Container) ByName(s string) (*{{ .EnumType }}, error) {
-  value := new({{ .EnumType }})
-  var err error = nil
+  var value *{{ .EnumType }} = new({{ .EnumType }})
 
   switch s { {{ range $e := .Elements }}
     case "{{ $e.Name | Cap }}": *value = _{{ $e.Name }}{{end}}
-    default: err = errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated by name %s", s))
+    default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated by name %s", s))
   }
 
-  return value, err
+  return value, nil
 }
 
 var valArray []{{ .EnumType }} = []{{ .EnumType }}{ {{ range $e := .Elements }}
