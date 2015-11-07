@@ -24,8 +24,8 @@ const ({{ range $e := .Elements }}
 
 func (v {{ .EnumType }}) String() string {
   switch v { {{ range $e := .Elements }}
-    case _{{ $e.Name }}: return "{{ $e.Type }}<{{ $e.Name | Cap }}>"{{end}}
-    default: return fmt.Sprintf("{{ .EnumType }}<Unknown(%d)>", int(v))
+    case _{{ $e.Name }}: return "{{ $e.Name | Cap }}"{{end}}
+    default: return fmt.Sprintf("Unknown(%d)", int(v))
   }
 }
 
