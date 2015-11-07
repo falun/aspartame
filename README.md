@@ -1,10 +1,19 @@
 ### Aspartame
 
-A `go:generate` tool that makes some go things (currently only "enums") slightly less annoying to me. Probably not idiomatic.
+A tool that makes some go things (currently only "enums") slightly less annoying to me. Probably not idiomatic.
 
 
 ##### Usage
-This describes eventual usage as the tooling doesn't actually parse command line args.
+Currently `aspartame` needs to be run as a command line tool as it only produces genertad ecode to STDOUT:
+
+	go get github.com/falun/aspartame
+	go install github.com/falun/aspartame
+	./bin/aspartame \
+	   -name Foo \
+	   -enumType FooEnumType \
+	   -source ./src/github.com/falun/aspartame/testdata/test-file.go
+
+Eventually you should be able to use it as a standard `go:generate` tool:
 
 	package main
 	
@@ -18,7 +27,7 @@ This describes eventual usage as the tooling doesn't actually parse command line
 		quux
 	)
 
-Note that the enum values we define are _not_ exported. This is not currently enforced but I'll add that eventually.
+Note that the enum values we define to be sweetened are _not_ exported. This is not currently enforced but I'll add that eventually.
 
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:

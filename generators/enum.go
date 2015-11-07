@@ -1,6 +1,7 @@
 package generators
 
 import (
+	"flag"
 	"fmt"
 	"io"
 	"os"
@@ -34,14 +35,14 @@ type {{ .EnumName }}Container struct { {{ range $e := .Elements }}
 
 // uncertain if I want to return pointer or not
 func (this *{{ .EnumName }}Container) ByValue(v int) (*{{ .EnumType }}, error) {
-	value := new({{ .EnumType }})
+  value := new({{ .EnumType }})
 
   switch v { {{ range $e := .Elements }}
     case int(_{{ $e.Name }}): *value = _{{ $e.Name }}{{end}}
     default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated with value %d", v))
   }
 
-	return value, nil
+  return value, nil
 }
 
 // uncertain if I want to return pointer or not
@@ -66,10 +67,7 @@ func (this *{{ .EnumName }}Container) Values() []{{ .EnumType }} {
 
 var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
     {{ $e.Name | Cap }}: _{{ $e.Name }},{{ end }}
-}
-
-// fin
-`
+}`
 
 func mkCap(s string) string {
 	return fmt.Sprintf("%s%s", strings.ToUpper(string(s[0])), s[1:])
@@ -147,4 +145,32 @@ func GenerateEnum(
 	} else {
 		fmt.Println("Found sourceConsts:", sourceConsts)
 	}
+}
+
+var enumName string
+var enumType string
+
+func EnumSetupFlags() {
+	flag.StringVar(&enumName, "name", "", "[required:enum] What name should we export the sweetened enum as")
+	flag.StringVar(&enumType, "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
+}
+
+func DoGenerateEnum(source *types.File, dest io.Writer) {
+	err := false
+
+	if enumType == "" {
+		fmt.Println("-enumType must be specified")
+		err = true
+	}
+
+	if enumName == "" {
+		fmt.Println("-name must be specified")
+		err = true
+	}
+
+	if err {
+		return
+	}
+
+	GenerateEnum(source, enumName, enumType, dest)
 }

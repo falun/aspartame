@@ -10,8 +10,9 @@ import (
 
 // Holds the information we need about a given Const
 type Const struct {
-	Type string
-	Name string
+	Type  string
+	Name  string
+	Value string
 }
 
 func (c Const) String() string {
@@ -105,7 +106,7 @@ func (f *File) parseConsts() {
 					for _, n := range vs.Names {
 						curConstBlock.Contents = append(
 							curConstBlock.Contents,
-							Const{Type: curType, Name: n.Name})
+							Const{Type: curType, Name: n.Name, Value: ""})
 					}
 				}
 			}
