@@ -8,6 +8,10 @@ import (
 	"go/token"
 )
 
+type Generator interface {
+	func DoGenerate(f *File, dest io.Writer)
+}
+
 // Holds the information we need about a given Const
 type Const struct {
 	Type  string

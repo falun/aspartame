@@ -9,12 +9,20 @@ import (
 	"github.com/falun/aspartame/types"
 )
 
+func isDirectory(name string) bool {
+	info, err := os.Stat(name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return info.IsDir()
+}
+
 func main() {
 	var target string
 	var filePath string
 
 	flag.StringVar(&target, "target", "enum", "What kind of sweetening should we be doing")
-	flag.StringVar(&filePath, "source", "", "File to operate on")
+	flag.StringVar(&filePath, "source", "./", "File, or directory, to operate on")
 	generators.EnumSetupFlags()
 
 	flag.Parse()
@@ -23,7 +31,10 @@ func main() {
 		return
 	}
 
-	f := types.NewFile(filePath)
+	if isDirectory(filePath) {
+	} else {
+		f := types.NewFile(filePath)
+	}
 
 	switch strings.ToLower(target) {
 	case "enum":
