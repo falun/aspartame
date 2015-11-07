@@ -3,7 +3,10 @@ package generators
 import (
 	"errors"
 	"fmt"
+	"go/build"
 	"io"
+	"log"
+	"os"
 	"strings"
 
 	"github.com/falun/aspartame/types"
@@ -11,6 +14,7 @@ import (
 
 type Generator interface {
 	SetupFlags()
+	LocateFile(string) *types.File
 	DoGenerate(*types.File, io.Writer)
 }
 
@@ -37,4 +41,17 @@ func Find(named string) (Generator, error) {
 	} else {
 		return g, nil
 	}
+}
+
+func IsDirectory(name string) bool {
+	info, err := os.Stat(name)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return info.IsDir()
+}
+
+func ParseDir(dir string) (*build.Package, error) {
+	pkg, err := build.Default.ImportDir(dir, 0)
+	return pkg, err
 }

@@ -4,7 +4,9 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
@@ -21,6 +23,43 @@ type EnumGeneratorT struct {
 func (eg *EnumGeneratorT) SetupFlags() {
 	flag.StringVar(&(eg.enumName), "name", "", "[required:enum] What name should we export the sweetened enum as")
 	flag.StringVar(&(eg.enumType), "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
+}
+
+func (eg *EnumGeneratorT) LocateFile(inputPath string) *types.File {
+	if !IsDirectory(inputPath) {
+		return types.NewFile(inputPath)
+	} else {
+		pkg, err := ParseDir(inputPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		baseDir := pkg.Dir
+		var possibilities []string
+		for _, presumptiveFile := range pkg.GoFiles {
+			possibilities = append(possibilities, filepath.Join(baseDir, presumptiveFile))
+		}
+
+		for _, path := range possibilities {
+			f := types.NewFile(path)
+			if eg.validate(f) {
+				return f
+			}
+		}
+
+		return nil
+	}
+}
+
+func (eg *EnumGeneratorT) validate(f *types.File) bool {
+	for _, consts := range f.Consts {
+		t, err := consts.Type()
+		if err == nil && t == eg.enumType && !consts.HasExported() {
+			return true
+		}
+	}
+
+	return false
 }
 
 func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest io.Writer) {
@@ -103,10 +142,9 @@ var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
 `
 
 type ConstItem struct {
-	Index        int
-	ExportedName string
-	Name         string
-	Type         string
+	Index int
+	Name  string
+	Type  string
 }
 
 type EnumData struct {
@@ -125,10 +163,9 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 
 	for i, v := range cb.Contents {
 		ci := ConstItem{
-			Index:        i,
-			ExportedName: fmt.Sprintf("aoeu%s", v.Name),
-			Name:         v.Name,
-			Type:         v.Type,
+			Index: i,
+			Name:  v.Name,
+			Type:  v.Type,
 		}
 		ed.Elements = append(ed.Elements, ci)
 	}

@@ -4,26 +4,20 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"os"
 
 	"github.com/falun/aspartame/generators"
-	"github.com/falun/aspartame/types"
 )
 
-func isDirectory(name string) bool {
-	info, err := os.Stat(name)
-	if err != nil {
-		log.Fatal(err)
-	}
-	return info.IsDir()
-}
-
 func main() {
-	var target string
-	var filePath string
+	var (
+		target   string
+		filePath string
+		output   string
+	)
 
-	flag.StringVar(&target, "target", "enum", "What kind of sweetening should we be doing")
+	flag.StringVar(&target, "type", "enum", "What kind of sweetening should we be doing")
 	flag.StringVar(&filePath, "source", "./", "File, or directory, to operate on")
+	flag.StringVar(&output, "output", "stdout", "Where should we produce output (file[:name]|stdout)")
 
 	for _, e := range generators.All() {
 		e.SetupFlags()
@@ -40,10 +34,10 @@ func main() {
 		log.Fatal(gErr)
 	}
 
-	if isDirectory(filePath) {
-		fmt.Println("Attempting to operate on directory:", filePath)
-	} else {
-		f := types.NewFile(filePath)
-		g.DoGenerate(f, nil)
+	f := g.LocateFile(filePath)
+	if f == nil {
+		log.Fatal("Could not find a file to operate on.")
 	}
+
+	g.DoGenerate(f, nil)
 }

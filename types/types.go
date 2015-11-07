@@ -60,6 +60,20 @@ func (cb *ConstBlock) Type() (string, error) {
 	}
 }
 
+func (cb *ConstBlock) HasExported() bool {
+	isExported := func(c rune) bool {
+		return c >= 'A' && c <= 'Z'
+	}
+
+	for _, c := range cb.Contents {
+		if isExported(rune(c.Name[0])) {
+			return true
+		}
+	}
+
+	return false
+}
+
 type File struct {
 	Path    string
 	Package string
