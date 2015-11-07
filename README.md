@@ -4,7 +4,7 @@ A tool that makes some go things (currently only "enums") slightly less annoying
 
 
 ##### Usage
-Currently `aspartame` needs to be run as a command line tool as it only produces genertad ecode to STDOUT:
+Currently `aspartame` needs to be run as a command line tool as it only produces generated code to STDOUT:
 
 	go get github.com/falun/aspartame
 	go install github.com/falun/aspartame
