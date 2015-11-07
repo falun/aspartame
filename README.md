@@ -42,7 +42,7 @@ The generated code will be produced in the same package and currently provides t
 * Enum value access via `$EnumName.$ValueName` (in our example above `Foo.Bar`, `Foo.Quix`, etc.)
 
 ##### Example
-See [this play link](http://bit.ly/1RDyktS)
+See [this play link](http://play.golang.org/p/WJqHhz2K6y)
 
 ##### Limitations
 They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out the values. Adding that should be pretty simple but didn't make the first cut.
