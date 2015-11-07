@@ -11,6 +11,38 @@ import (
 	"github.com/falun/aspartame/types"
 )
 
+var EnumGenerator *EnumGeneratorT = &EnumGeneratorT{}
+
+type EnumGeneratorT struct {
+	enumName string
+	enumType string
+}
+
+func (eg *EnumGeneratorT) SetupFlags() {
+	flag.StringVar(&(eg.enumName), "name", "", "[required:enum] What name should we export the sweetened enum as")
+	flag.StringVar(&(eg.enumType), "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
+}
+
+func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest io.Writer) {
+	err := false
+
+	if eg.enumType == "" {
+		fmt.Println("-enumType must be specified")
+		err = true
+	}
+
+	if eg.enumName == "" {
+		fmt.Println("-name must be specified")
+		err = true
+	}
+
+	if err {
+		return
+	}
+
+	GenerateEnum(source, eg.enumName, eg.enumType, dest)
+}
+
 var enumTemplate string = `package {{ .Package }}
 
 import (
@@ -67,11 +99,8 @@ func (this *{{ .EnumName }}Container) Values() []{{ .EnumType }} {
 
 var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
     {{ $e.Name | Cap }}: _{{ $e.Name }},{{ end }}
-}`
-
-func mkCap(s string) string {
-	return fmt.Sprintf("%s%s", strings.ToUpper(string(s[0])), s[1:])
 }
+`
 
 type ConstItem struct {
 	Index        int
@@ -107,6 +136,10 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 	ed.EnumType = ed.Elements[0].Type
 
 	return ed
+}
+
+func mkCap(s string) string {
+	return fmt.Sprintf("%s%s", strings.ToUpper(string(s[0])), s[1:])
 }
 
 func GenerateEnum(
@@ -145,32 +178,4 @@ func GenerateEnum(
 	} else {
 		fmt.Println("Found sourceConsts:", sourceConsts)
 	}
-}
-
-var enumName string
-var enumType string
-
-func EnumSetupFlags() {
-	flag.StringVar(&enumName, "name", "", "[required:enum] What name should we export the sweetened enum as")
-	flag.StringVar(&enumType, "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
-}
-
-func DoGenerateEnum(source *types.File, dest io.Writer) {
-	err := false
-
-	if enumType == "" {
-		fmt.Println("-enumType must be specified")
-		err = true
-	}
-
-	if enumName == "" {
-		fmt.Println("-name must be specified")
-		err = true
-	}
-
-	if err {
-		return
-	}
-
-	GenerateEnum(source, enumName, enumType, dest)
 }
