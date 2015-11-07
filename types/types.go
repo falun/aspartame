@@ -6,6 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
+	// "io"
 )
 
 // Holds the information we need about a given Const
@@ -57,6 +58,20 @@ func (cb *ConstBlock) Type() (string, error) {
 	} else {
 		return "", typeErrMany
 	}
+}
+
+func (cb *ConstBlock) HasExported() bool {
+	isExported := func(c rune) bool {
+		return c >= 'A' && c <= 'Z'
+	}
+
+	for _, c := range cb.Contents {
+		if isExported(rune(c.Name[0])) {
+			return true
+		}
+	}
+
+	return false
 }
 
 type File struct {

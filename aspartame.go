@@ -3,19 +3,25 @@ package main
 import (
 	"flag"
 	"fmt"
-	"strings"
+	"log"
 
 	"github.com/falun/aspartame/generators"
-	"github.com/falun/aspartame/types"
 )
 
 func main() {
-	var target string
-	var filePath string
+	var (
+		target   string
+		filePath string
+		output   string
+	)
 
-	flag.StringVar(&target, "target", "enum", "What kind of sweetening should we be doing")
-	flag.StringVar(&filePath, "source", "", "File to operate on")
-	generators.EnumSetupFlags()
+	flag.StringVar(&target, "type", "enum", "What kind of sweetening should we be doing")
+	flag.StringVar(&filePath, "source", "./", "File, or directory, to operate on")
+	flag.StringVar(&output, "output", "stdout", "Where should we produce output (file[:name]|stdout)")
+
+	for _, e := range generators.All() {
+		e.SetupFlags()
+	}
 
 	flag.Parse()
 	if filePath == "" {
@@ -23,12 +29,15 @@ func main() {
 		return
 	}
 
-	f := types.NewFile(filePath)
-
-	switch strings.ToLower(target) {
-	case "enum":
-		generators.DoGenerateEnum(f, nil)
-	default:
-		fmt.Sprintf("Unreconized target type '%s'\n", target)
+	g, gErr := generators.Find(target)
+	if gErr != nil {
+		log.Fatal(gErr)
 	}
+
+	f := g.LocateFile(filePath)
+	if f == nil {
+		log.Fatal("Could not find a file to operate on.")
+	}
+
+	g.DoGenerate(f, nil)
 }

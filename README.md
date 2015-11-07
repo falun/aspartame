@@ -11,7 +11,7 @@ Currently `aspartame` needs to be run as a command line tool as it only produces
 	./bin/aspartame \
 	   -name Foo \
 	   -enumType FooEnumType \
-	   -source ./src/github.com/falun/aspartame/testdata/test-file.go
+	   -source ./src/github.com/falun/aspartame/testdata/
 
 Eventually you should be able to use it as a standard `go:generate` tool:
 
@@ -27,7 +27,10 @@ Eventually you should be able to use it as a standard `go:generate` tool:
 		quux
 	)
 
-Note that the enum values we define to be sweetened are _not_ exported. This is not currently enforced but I'll add that eventually.
+The tool checks for two things when examining a const block declaration and determining if it meets the requirement for sweetening.
+
+1. The values are _not_ exported. The reasoning is that we want to limit confusion about what is available in the package namespace.
+2. The const block declares _only_ values of the same type.
 
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
@@ -36,9 +39,10 @@ The generated code will be produced in the same package and currently provides t
 * `String()`&mdash;readable output
 * `ByValue(int)`&mdash;given an int find the corresponding enum value
 * `ByName(string)`&mdash;given an enum name produce the corresponding value
+* Enum value access via `$EnumName.$ValueName` (in our example above `Foo.Bar`, `Foo.Quix`, etc.)
 
 ##### Example
-See [this play link](http://play.golang.org/p/LXUrNnEy0E)
+See [this play link](http://bit.ly/1RDyktS)
 
 ##### Limitations
 They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out the values. Adding that should be pretty simple but didn't make the first cut.

@@ -4,12 +4,83 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"text/template"
 
 	"github.com/falun/aspartame/types"
 )
+
+var EnumGenerator *EnumGeneratorT = &EnumGeneratorT{}
+
+type EnumGeneratorT struct {
+	enumName string
+	enumType string
+}
+
+func (eg *EnumGeneratorT) SetupFlags() {
+	flag.StringVar(&(eg.enumName), "name", "", "[required:enum] What name should we export the sweetened enum as")
+	flag.StringVar(&(eg.enumType), "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
+}
+
+func (eg *EnumGeneratorT) LocateFile(inputPath string) *types.File {
+	if !IsDirectory(inputPath) {
+		return types.NewFile(inputPath)
+	} else {
+		pkg, err := ParseDir(inputPath)
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		baseDir := pkg.Dir
+		var possibilities []string
+		for _, presumptiveFile := range pkg.GoFiles {
+			possibilities = append(possibilities, filepath.Join(baseDir, presumptiveFile))
+		}
+
+		for _, path := range possibilities {
+			f := types.NewFile(path)
+			if eg.validate(f) {
+				return f
+			}
+		}
+
+		return nil
+	}
+}
+
+func (eg *EnumGeneratorT) validate(f *types.File) bool {
+	for _, consts := range f.Consts {
+		t, err := consts.Type()
+		if err == nil && t == eg.enumType && !consts.HasExported() {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest io.Writer) {
+	err := false
+
+	if eg.enumType == "" {
+		fmt.Println("-enumType must be specified")
+		err = true
+	}
+
+	if eg.enumName == "" {
+		fmt.Println("-name must be specified")
+		err = true
+	}
+
+	if err {
+		return
+	}
+
+	GenerateEnum(source, eg.enumName, eg.enumType, dest)
+}
 
 var enumTemplate string = `package {{ .Package }}
 
@@ -24,8 +95,8 @@ const ({{ range $e := .Elements }}
 
 func (v {{ .EnumType }}) String() string {
   switch v { {{ range $e := .Elements }}
-    case _{{ $e.Name }}: return "{{ $e.Type }}<{{ $e.Name | Cap }}>"{{end}}
-    default: return fmt.Sprintf("{{ .EnumType }}<Unknown(%d)>", int(v))
+    case _{{ $e.Name }}: return "{{ $e.Name | Cap }}"{{end}}
+    default: return fmt.Sprintf("Unknown(%d)", int(v))
   }
 }
 
@@ -67,17 +138,13 @@ func (this *{{ .EnumName }}Container) Values() []{{ .EnumType }} {
 
 var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
     {{ $e.Name | Cap }}: _{{ $e.Name }},{{ end }}
-}`
-
-func mkCap(s string) string {
-	return fmt.Sprintf("%s%s", strings.ToUpper(string(s[0])), s[1:])
 }
+`
 
 type ConstItem struct {
-	Index        int
-	ExportedName string
-	Name         string
-	Type         string
+	Index int
+	Name  string
+	Type  string
 }
 
 type EnumData struct {
@@ -96,10 +163,9 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 
 	for i, v := range cb.Contents {
 		ci := ConstItem{
-			Index:        i,
-			ExportedName: fmt.Sprintf("aoeu%s", v.Name),
-			Name:         v.Name,
-			Type:         v.Type,
+			Index: i,
+			Name:  v.Name,
+			Type:  v.Type,
 		}
 		ed.Elements = append(ed.Elements, ci)
 	}
@@ -107,6 +173,10 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 	ed.EnumType = ed.Elements[0].Type
 
 	return ed
+}
+
+func mkCap(s string) string {
+	return fmt.Sprintf("%s%s", strings.ToUpper(string(s[0])), s[1:])
 }
 
 func GenerateEnum(
@@ -145,32 +215,4 @@ func GenerateEnum(
 	} else {
 		fmt.Println("Found sourceConsts:", sourceConsts)
 	}
-}
-
-var enumName string
-var enumType string
-
-func EnumSetupFlags() {
-	flag.StringVar(&enumName, "name", "", "[required:enum] What name should we export the sweetened enum as")
-	flag.StringVar(&enumType, "enumType", "", "[required:enum] The type of the enum we'll be sweetening")
-}
-
-func DoGenerateEnum(source *types.File, dest io.Writer) {
-	err := false
-
-	if enumType == "" {
-		fmt.Println("-enumType must be specified")
-		err = true
-	}
-
-	if enumName == "" {
-		fmt.Println("-name must be specified")
-		err = true
-	}
-
-	if err {
-		return
-	}
-
-	GenerateEnum(source, enumName, enumType, dest)
 }
