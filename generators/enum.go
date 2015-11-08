@@ -26,7 +26,11 @@ func (eg *EnumGeneratorT) SetupFlags() {
 
 func (eg *EnumGeneratorT) LocateFile(inputPath string) *types.File {
 	if !IsDirectory(inputPath) {
-		return types.NewFile(inputPath)
+		f := types.NewFile(inputPath)
+		if !eg.validate(f) {
+			return nil
+		}
+		return f
 	} else {
 		pkg, err := ParseDir(inputPath)
 		if err != nil {
@@ -53,7 +57,14 @@ func (eg *EnumGeneratorT) LocateFile(inputPath string) *types.File {
 func (eg *EnumGeneratorT) validate(f *types.File) bool {
 	for _, consts := range f.Consts {
 		t, err := consts.Type()
+
 		if err == nil && t == eg.enumType && !consts.HasExported() {
+			// check for leading _
+			for _, c := range consts.Contents {
+				if c.Name[0] == '_' {
+					return false
+				}
+			}
 			return true
 		}
 	}

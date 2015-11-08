@@ -10,7 +10,6 @@ import (
 )
 
 func outputPath(outputArg string) *string {
-	fmt.Println("testing:", outputArg)
 	var s = new(string)
 
 	switch outputArg {

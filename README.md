@@ -31,8 +31,8 @@ Note that `-source $GOFILE` is optional but prevents the tool from guessing the 
 
 The tool checks for two things when examining a const block declaration and determining if it meets the requirement for sweetening.
 
-1. The values are _not_ exported. The reasoning is that we want to limit confusion about what is available in the package namespace.
-2. *TODO* The values do not begin with `_`
+1. The values are _not_ exported. The reasoning is that we want to limit confusion about what is available in the package namespace;
+2. The enum value names do not begin with `_`;
 3. The const block declares _only_ values of the same type.
 
 ##### Results
