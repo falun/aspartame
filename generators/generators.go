@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"go/build"
-	"io"
 	"log"
 	"os"
 	"strings"
@@ -15,7 +14,7 @@ import (
 type Generator interface {
 	SetupFlags()
 	LocateFile(string) *types.File
-	DoGenerate(*types.File, io.Writer)
+	DoGenerate(*types.File, *string)
 }
 
 // Each of the types of generation we support

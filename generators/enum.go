@@ -3,7 +3,7 @@ package generators
 import (
 	"flag"
 	"fmt"
-	"io"
+	// "io"
 	"log"
 	"os"
 	"path/filepath"
@@ -62,7 +62,7 @@ func (eg *EnumGeneratorT) validate(f *types.File) bool {
 	return false
 }
 
-func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest io.Writer) {
+func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest *string) {
 	err := false
 
 	if eg.enumType == "" {
@@ -183,7 +183,7 @@ func GenerateEnum(
 	source *types.File,
 	enumName string,
 	enumType string,
-	dest io.Writer,
+	dest *string,
 ) {
 	funcMap := template.FuncMap{
 		"Cap": mkCap,
@@ -196,8 +196,18 @@ func GenerateEnum(
 		return
 	}
 
-	if dest == nil {
-		dest = os.Stdout
+	destWriter := os.Stdout
+	if dest != nil {
+		// TOOD: extract basedir from source.Path
+		path := ""
+		switch *dest {
+		case "":
+			path = filepath.Join(source.Path, fmt.Sprintf("%s_enum.go", strings.ToLower(enumName)))
+		default:
+			path = filepath.Join(source.Path, *dest)
+		}
+		fmt.Println("filePath:", path)
+		return
 	}
 
 	var sourceConsts *types.ConstBlock = nil
@@ -211,8 +221,8 @@ func GenerateEnum(
 	}
 
 	if sourceConsts != nil {
-		templateParsed.Execute(dest, constBlockToEnumData(enumName, source, sourceConsts))
+		templateParsed.Execute(destWriter, constBlockToEnumData(enumName, source, sourceConsts))
 	} else {
-		fmt.Println("Found sourceConsts:", sourceConsts)
+		log.Fatal(fmt.Sprintf("Could not find enum source: %s", source.Path))
 	}
 }
