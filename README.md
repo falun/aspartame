@@ -1,6 +1,6 @@
 ### Aspartame
 
-A tool that makes some go things (currently only "enums") slightly less annoying to me. Probably not idiomatic.
+A tool that makes some go things (currently only "enums") slightly less annoying to me. Probably not idiomatic; check [TODO](TODO.md) for potential changes / ways to contribute.
 
 
 ##### Usage
