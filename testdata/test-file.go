@@ -1,6 +1,6 @@
 package testdata
 
-// go:generate aspartame -target enum -name Foo -source FooEnumType
+//go:generate aspartame -name Foo -enumType FooEnumType -source $GOFILE
 type FooEnumType int
 
 const (

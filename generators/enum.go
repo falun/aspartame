@@ -205,7 +205,6 @@ func GenerateEnum(
 		default:
 			path = filepath.Join(basedir, *dest)
 		}
-		fmt.Println("filePath:", path)
 		fPtr, fErr := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 
 		if fErr != nil {

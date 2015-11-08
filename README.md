@@ -4,7 +4,7 @@ A tool that makes some go things (currently only "enums") slightly less annoying
 
 
 ##### Usage
-Currently `aspartame` needs to be run as a command line tool as it only produces generated code to STDOUT:
+`aspartame` may be run via command line:
 
 	go get github.com/falun/aspartame
 	go install github.com/falun/aspartame
@@ -13,11 +13,11 @@ Currently `aspartame` needs to be run as a command line tool as it only produces
 	   -enumType FooEnumType \
 	   -source ./src/github.com/falun/aspartame/testdata/
 
-Eventually you should be able to use it as a standard `go:generate` tool:
+or as a `go:generate` tool:
 
 	package main
 	
-	// go:generate aspartame -target enum -name Foo -source FooEnumType
+	//go:generate aspartame -name Foo -enumType FooEnumType -source $GOFILE
 	type FooEnumType int
 	
 	const (
@@ -27,10 +27,13 @@ Eventually you should be able to use it as a standard `go:generate` tool:
 		quux
 	)
 
+Note that `-source $GOFILE` is optional but prevents the tool from guessing the wrong file since a generated file will be a potential match if we're given only the type name to target.
+
 The tool checks for two things when examining a const block declaration and determining if it meets the requirement for sweetening.
 
 1. The values are _not_ exported. The reasoning is that we want to limit confusion about what is available in the package namespace.
-2. The const block declares _only_ values of the same type.
+2. *TODO* The values do not begin with `_`
+3. The const block declares _only_ values of the same type.
 
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
@@ -45,4 +48,4 @@ The generated code will be produced in the same package and currently provides t
 See [this play link](http://play.golang.org/p/WJqHhz2K6y)
 
 ##### Limitations
-They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out the values. Adding that should be pretty simple but didn't make the first cut.
+They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out values in assignment. Adding that should be pretty simple but didn't make the first cut.
