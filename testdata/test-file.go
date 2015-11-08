@@ -1,9 +1,4 @@
-package main
-
-import (
-	"errors"
-	"fmt"
-)
+package testdata
 
 // go:generate aspartame -target enum -name Foo -source FooEnumType
 type FooEnumType int

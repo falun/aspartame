@@ -3,7 +3,6 @@ package generators
 import (
 	"flag"
 	"fmt"
-	// "io"
 	"log"
 	"os"
 	"path/filepath"
@@ -198,16 +197,23 @@ func GenerateEnum(
 
 	destWriter := os.Stdout
 	if dest != nil {
-		// TOOD: extract basedir from source.Path
+		basedir := filepath.Dir(source.Path)
 		path := ""
 		switch *dest {
 		case "":
-			path = filepath.Join(source.Path, fmt.Sprintf("%s_enum.go", strings.ToLower(enumName)))
+			path = filepath.Join(basedir, fmt.Sprintf("%s_enum.go", strings.ToLower(enumName)))
 		default:
-			path = filepath.Join(source.Path, *dest)
+			path = filepath.Join(basedir, *dest)
 		}
 		fmt.Println("filePath:", path)
-		return
+		fPtr, fErr := os.OpenFile(path, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+
+		if fErr != nil {
+			log.Fatal(fErr)
+		}
+		defer fPtr.Close()
+
+		destWriter = fPtr
 	}
 
 	var sourceConsts *types.ConstBlock = nil
