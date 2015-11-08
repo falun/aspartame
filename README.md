@@ -49,4 +49,3 @@ See [this play link](http://play.golang.org/p/WJqHhz2K6y)
 
 ##### Limitations
 I'm sure there are a lot but thus far it's good enough for my uses. File an issue of something doesn't work the way you expect.
-They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out values in assignment. Adding that should be pretty simple but didn't make the first cut.
