@@ -38,14 +38,15 @@ The tool checks for two things when examining a const block declaration and dete
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
 
-* `Values()`&mdash;produces an array of all values
-* `String()`&mdash;readable output
-* `ByValue(int)`&mdash;given an int find the corresponding enum value
-* `ByName(string)`&mdash;given an enum name produce the corresponding value
 * Enum value access via `$EnumName.$ValueName` (in our example above `Foo.Bar`, `Foo.Quix`, etc.)
+* `$EnumName.Values()`&mdash;produces an array of all values
+* `$EnumName.String()`&mdash;readable output
+* `$EnumName.ByValue(int)`&mdash;given an int find the corresponding enum value
+* `$EnumName.ByName(string)`&mdash;given an enum name produce the corresponding value
 
 ##### Example
 See [this play link](http://play.golang.org/p/WJqHhz2K6y)
 
 ##### Limitations
+I'm sure there are a lot but thus far it's good enough for my uses. File an issue of something doesn't work the way you expect.
 They are legion. High on the list though is that `aspartame` currently only supports int-typed enums and doesn't parse out values in assignment. Adding that should be pretty simple but didn't make the first cut.

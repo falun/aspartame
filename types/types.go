@@ -6,7 +6,7 @@ import (
 	"go/ast"
 	"go/parser"
 	"go/token"
-	// "io"
+	"log"
 )
 
 // Holds the information we need about a given Const
@@ -99,6 +99,27 @@ func (f *File) String() string {
 	return str
 }
 
+func parseValue(expr ast.Expr) string {
+	if expr == nil {
+		return ""
+	}
+
+	if casted, ok := expr.(*ast.Ident); ok {
+		return casted.Name
+	}
+
+	if casted, ok := expr.(*ast.BasicLit); ok {
+		return casted.Value
+	}
+
+	if casted, ok := expr.(*ast.BinaryExpr); ok {
+		return fmt.Sprintf("(%s) %s (%s)", parseValue(casted.X), casted.Op, parseValue(casted.Y))
+	}
+
+	log.Printf("Could not parse value from: %s", expr)
+	return ""
+}
+
 func (f *File) parseConsts() {
 	blocks := make([]ConstBlock, 0)
 
@@ -118,10 +139,15 @@ func (f *File) parseConsts() {
 						curType = fmt.Sprintf("%s", vs.Type)
 					}
 
-					for _, n := range vs.Names {
+					for i, n := range vs.Names {
+						value := ""
+						if i < len(vs.Values) {
+							value = parseValue((vs.Values[i]))
+						}
+
 						curConstBlock.Contents = append(
 							curConstBlock.Contents,
-							Const{Type: curType, Name: n.Name, Value: ""})
+							Const{Type: curType, Name: n.Name, Value: value})
 					}
 				}
 			}

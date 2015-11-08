@@ -4,9 +4,9 @@ package testdata
 type FooEnumType int
 
 const (
-	bar FooEnumType = iota
-	baz
-	quix
+	bar  FooEnumType = 1<<10 + iota
+	baz              = 3 + 4 + 5
+	quix             = 1234 + iota
 	quux
 )
 
@@ -15,4 +15,9 @@ const (
 	block
 	of
 	constValues
+)
+
+const (
+	mixed      FooEnumType = iota
+	collection int         = 23
 )

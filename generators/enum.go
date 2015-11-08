@@ -100,7 +100,7 @@ import (
 )
 
 const ({{ range $e := .Elements }}
-    _{{ $e.Name }}{{if eq 0 $e.Index }} {{ $e.Type }}{{end}} {{ if eq $e.Index 0 }} = iota{{end}}{{ end }}
+  _{{ $e.Name }} {{ if eq $e.Index 0 }}{{ $e.Type }}{{ end }}{{ if eq $e.Value "" }}{{ if eq $e.Index 0}} = iota{{ end }}{{else}} = {{ $e.Value }}{{ end }}{{ end }}
 )
 
 func (v {{ .EnumType }}) String() string {
@@ -155,6 +155,7 @@ type ConstItem struct {
 	Index int
 	Name  string
 	Type  string
+	Value string
 }
 
 type EnumData struct {
@@ -176,6 +177,7 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 			Index: i,
 			Name:  v.Name,
 			Type:  v.Type,
+			Value: v.Value,
 		}
 		ed.Elements = append(ed.Elements, ci)
 	}
