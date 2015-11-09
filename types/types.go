@@ -116,7 +116,7 @@ func parseValue(expr ast.Expr) string {
 		return fmt.Sprintf("(%s) %s (%s)", parseValue(casted.X), casted.Op, parseValue(casted.Y))
 	}
 
-	log.Printf("Could not parse value from: %s", expr)
+	log.Printf("Could not parse value from: %T, %s", expr, expr)
 	return ""
 }
 
