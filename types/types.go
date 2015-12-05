@@ -11,13 +11,14 @@ import (
 
 // Holds the information we need about a given Const
 type Const struct {
-	Type  string
-	Name  string
-	Value string
+	Type    string
+	Name    string
+	Value   string
+	Comment string
 }
 
 func (c Const) String() string {
-	return fmt.Sprintf("Const[%s, %s]", c.Name, c.Type)
+	return fmt.Sprintf("Const[%s, %s, '%s'] = %s", c.Name, c.Type, c.Comment, c.Value)
 }
 
 // Logical grouping of consts within the file; this also represents the
@@ -145,9 +146,14 @@ func (f *File) parseConsts() {
 							value = parseValue((vs.Values[i]))
 						}
 
+						comment := ""
+						if vs.Comment != nil && len(vs.Comment.List) >= i {
+							comment = vs.Comment.List[i].Text[2:]
+						}
+
 						curConstBlock.Contents = append(
 							curConstBlock.Contents,
-							Const{Type: curType, Name: n.Name, Value: value})
+							Const{Type: curType, Name: n.Name, Value: value, Comment: comment})
 					}
 				}
 			}

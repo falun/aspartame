@@ -105,7 +105,7 @@ const ({{ range $e := .Elements }}
 
 func (v {{ .EnumType }}) String() string {
 	switch v { {{ range $e := .Elements }}
-		case _{{ $e.Name }}: return "{{ $e.Name | Cap }}"{{end}}
+		case _{{ $e.Name }}: return "{{ $e.RenderName }}"{{end}}
 		default: return fmt.Sprintf("Unknown(%d)", int(v))
 	}
 }
@@ -131,7 +131,7 @@ func (this *{{ .EnumName }}Container) ByName(s string) (*{{ .EnumType }}, error)
 	var value *{{ .EnumType }} = new({{ .EnumType }})
 
 	switch s { {{ range $e := .Elements }}
-		case "{{ $e.Name | Cap }}": *value = _{{ $e.Name }}{{end}}
+		case "{{ $e.RenderName }}": *value = _{{ $e.Name }}{{end}}
 		default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated by name %s", s))
 	}
 
@@ -152,10 +152,11 @@ var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
 `
 
 type ConstItem struct {
-	Index int
-	Name  string
-	Type  string
-	Value string
+	Index      int
+	Name       string
+	RenderName string
+	Type       string
+	Value      string
 }
 
 type EnumData struct {
@@ -173,11 +174,24 @@ func constBlockToEnumData(enumName string, f *types.File, cb *types.ConstBlock) 
 	}
 
 	for i, v := range cb.Contents {
+		renderName := mkCap(v.Name)
+		portions := strings.Split(v.Comment, ",")
+
+		for _, p := range portions {
+			if segments := strings.Split(p, ":"); len(segments) == 2 {
+				if k := strings.Trim(segments[0], " \n"); k == "render" {
+					renderName = strings.Trim(segments[1], " \n")
+					break
+				}
+			}
+		}
+
 		ci := ConstItem{
-			Index: i,
-			Name:  v.Name,
-			Type:  v.Type,
-			Value: v.Value,
+			Index:      i,
+			RenderName: renderName,
+			Name:       v.Name,
+			Type:       v.Type,
+			Value:      v.Value,
 		}
 		ed.Elements = append(ed.Elements, ci)
 	}
