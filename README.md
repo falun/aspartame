@@ -35,6 +35,17 @@ The tool checks for two things when examining a const block declaration and dete
 2. The enum value names do not begin with `_`;
 3. The const block declares _only_ values of the same type.
 
+Additionally if you want to change how an enum is represented as a string value you can add a `render` directive as a comment to the declaration. An example of that would be:
+
+	const (
+		bar FooEnumType = iota
+		baz
+		quix // render: QuiX
+		quux
+	)
+
+Now when converting `Foo.Quix` to or from a string "QuiX" is the expected name. Currently standard camel case is still used in code. The play example below makes use of the render tag.
+
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
 
@@ -45,7 +56,7 @@ The generated code will be produced in the same package and currently provides t
 * `$EnumName.ByName(string)`&mdash;given an enum name produce the corresponding value
 
 ##### Example
-See [this play link](http://play.golang.org/p/WJqHhz2K6y)
+See [this play link](http://play.golang.org/p/hKnt5OLNvp)
 
 ##### Limitations
 I'm sure there are a lot but thus far it's good enough for my uses. File an issue of something doesn't work the way you expect.
