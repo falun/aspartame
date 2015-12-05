@@ -4,7 +4,7 @@ package testdata
 type FooEnumType int
 
 const (
-	bar  FooEnumType = 1<<10 + iota
+	bar  FooEnumType = 1<<10 + iota //render:BAZ
 	baz              = 3 + 4 + 5
 	quix             = 1234 + iota
 	quux
