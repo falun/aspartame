@@ -95,59 +95,59 @@ func (eg *EnumGeneratorT) DoGenerate(source *types.File, dest *string) {
 var enumTemplate string = `package {{ .Package }}
 
 import (
-  "errors"
-  "fmt"
+	"errors"
+	"fmt"
 )
 
 const ({{ range $e := .Elements }}
-  _{{ $e.Name }} {{ if eq $e.Index 0 }}{{ $e.Type }}{{ end }}{{ if eq $e.Value "" }}{{ if eq $e.Index 0}} = iota{{ end }}{{else}} = {{ $e.Value }}{{ end }}{{ end }}
+	_{{ $e.Name }} {{ if eq $e.Index 0 }}{{ $e.Type }}{{ end }}{{ if eq $e.Value "" }}{{ if eq $e.Index 0}} = iota{{ end }}{{else}} = {{ $e.Value }}{{ end }}{{ end }}
 )
 
 func (v {{ .EnumType }}) String() string {
-  switch v { {{ range $e := .Elements }}
-    case _{{ $e.Name }}: return "{{ $e.Name | Cap }}"{{end}}
-    default: return fmt.Sprintf("Unknown(%d)", int(v))
-  }
+	switch v { {{ range $e := .Elements }}
+		case _{{ $e.Name }}: return "{{ $e.Name | Cap }}"{{end}}
+		default: return fmt.Sprintf("Unknown(%d)", int(v))
+	}
 }
 
 type {{ .EnumName }}Container struct { {{ range $e := .Elements }}
-    {{ $e.Name | Cap }} {{ $e.Type }}{{ end }}
+	{{ $e.Name | Cap }} {{ $e.Type }}{{ end }}
 }
 
 // uncertain if I want to return pointer or not
 func (this *{{ .EnumName }}Container) ByValue(v int) (*{{ .EnumType }}, error) {
-  value := new({{ .EnumType }})
+	value := new({{ .EnumType }})
 
-  switch v { {{ range $e := .Elements }}
-    case int(_{{ $e.Name }}): *value = _{{ $e.Name }}{{end}}
-    default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated with value %d", v))
-  }
+	switch v { {{ range $e := .Elements }}
+		case int(_{{ $e.Name }}): *value = _{{ $e.Name }}{{end}}
+		default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated with value %d", v))
+	}
 
-  return value, nil
+	return value, nil
 }
 
 // uncertain if I want to return pointer or not
 func (this *{{ .EnumName }}Container) ByName(s string) (*{{ .EnumType }}, error) {
-  var value *{{ .EnumType }} = new({{ .EnumType }})
+	var value *{{ .EnumType }} = new({{ .EnumType }})
 
-  switch s { {{ range $e := .Elements }}
-    case "{{ $e.Name | Cap }}": *value = _{{ $e.Name }}{{end}}
-    default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated by name %s", s))
-  }
+	switch s { {{ range $e := .Elements }}
+		case "{{ $e.Name | Cap }}": *value = _{{ $e.Name }}{{end}}
+		default: return nil, errors.New(fmt.Sprintf("Unable to find {{ .EnumType }} associated by name %s", s))
+	}
 
-  return value, nil
+	return value, nil
 }
 
 var valArray []{{ .EnumType }} = []{{ .EnumType }}{ {{ range $e := .Elements }}
-  _{{ $e.Name }},{{ end }}
+	_{{ $e.Name }},{{ end }}
 }
 
 func (this *{{ .EnumName }}Container) Values() []{{ .EnumType }} {
-  return valArray
+	return valArray
 }
 
 var {{ .EnumName }} = &{{ .EnumName }}Container{ {{ range $e := .Elements }}
-    {{ $e.Name | Cap }}: _{{ $e.Name }},{{ end }}
+	{{ $e.Name | Cap }}: _{{ $e.Name }},{{ end }}
 }
 `
 
