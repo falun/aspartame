@@ -44,7 +44,7 @@ Additionally if you want to change how an enum is represented as a string value 
 		quux
 	)
 
-Now when converting `Foo.Quix` to or from a string "QuiX" is the expected name. Currently standard camel case is still used in code. The play example below makes use of the render tag.
+Now when converting `Foo.Quix` to or from a string "QuiX" is the expected name.  The const as accessed in code will just be a capitalized version of the initial definition and the rendered value does not come into play. The play example below makes use of the render tag.
 
 ##### Results
 The generated code will be produced in the same package and currently provides the following convenience methods:
